@@ -1,0 +1,42 @@
+import win32com.client as win32
+from PIL import ImageGrab 
+
+
+#open_excel
+xlapp=win32.DispatchEx('Excel.Application')
+xlapp.DisplayAlerts = False
+xlapp.Visible =True
+xlbook=xlapp.Workbooks.Open(r'C:\Users\Parul.Lamba\OneDrive - C2FO\Documents\Reliance\Reliance_suppliers.xlsx')
+xlbook.RefreshAll()
+xlbook.Save()
+sheet=xlbook.Sheets[0]
+copyrange=sheet.Range('A3: C5878')
+copyrange.CopyPicture(Appearance=1,Format=2)
+ImageGrab.grabclipboard().save('paste.png')
+xlapp.Quit()
+
+imagepath=r"C:\Users\Parul.Lamba\paste.png"
+html_body="""
+<div>
+please review
+</div>
+<div>
+<img src={}></img>
+</div>
+"""
+
+ol=win32.Dispatch("outlook.application")
+olmailitem=0x0 
+newmail=ol.CreateItem(olmailitem)
+newmail.Subject= 'Testing Mail'
+newmail.To='xyz@gmail.com'
+newmail.CC='xyz@gmail.com'
+newmail.HTMLBody= html_body.format(imagepath)
+
+
+
+# To attach a file to the email :
+#attachment  = r"C:\Users\Parul.Lamba\OneDrive - C2FO\Documents\Reliance_suppliers.xlsx"
+newmail.Attachments.Add(r"C:\Users\Parul.Lamba\OneDrive - C2FO\Documents\Reliance\Reliance_suppliers.xlsx")
+newmail.display()
+#newmail.send()
