@@ -1,0 +1,54 @@
+#downloading attachments
+t=date.today()
+todaydate=t.strftime('%d.%m.%Y')
+subject_line = 'PV_Invoice'
+att='PV_Invoice'
+save_location=folder
+outlook=win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
+inbox=outlook.Folders("xyz@gmail.com").Folders("DBI")
+t=date.today()
+
+    
+messages=inbox.Items
+messages.Sort("[SentOn]",True)
+messages=messages.Restrict("@SQL=urn:schemas:httpmail:subject like '%PV_Invoice %'")
+data=[]
+latest_email=messages[0]
+match_str = re.search(r'\d{2}.\d{2}.\d{4}', latest_email.Subject)
+print(match_str)
+try:
+    res = datetime.strptime(match_str.group(), '%d.%m.%Y').date()
+except:
+    os.system('taskkill /im outlook.exe /f')
+    os.system('start outlook')
+    msg="Error in date format mentioned in subject line"
+    send_slack_notification(msg)
+    exit()
+data.append(str(res))
+     
+max_date=max(data)
+max_date1 = datetime.strptime(max_date, '%Y-%m-%d').date()
+max_date=max_date1.strftime('%d.%m.%Y')
+# print(max_date)
+   
+for message in messages:
+    subject=message.Subject
+    attachments=message.Attachments 
+    def download():
+           
+      for attachment in attachments :
+          attachment_name = str(attachment)
+          print(attachment_name)
+          time.sleep(8)
+          if attachment_name.endswith('.xlsx') and att in attachment_name:
+              save_file_path = os.path.join (save_location,attachment_name)
+              print(attachment_name)
+              time.sleep(5)
+              attachment.SaveAsFile(save_file_path)
+              break
+         
+        
+            
+    # Attachment downloaded
+    if subject_line in subject and max_date in subject:
+        download()
