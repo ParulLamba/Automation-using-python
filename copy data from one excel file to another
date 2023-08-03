@@ -1,0 +1,87 @@
+t=date.today()
+directory = Path(__file__).parent.absolute()
+File=directory/"Raw_file.xlsx"
+
+  #create new workbook in which data will be saved
+New_workbook=Workbook()
+new_sheet=New_workbook.active
+New_workbook.save(filename=directory /"Final"/"Reports.xlsx")
+filename1 = directory /"Final"/"Reports.xlsx"
+
+
+
+time.sleep(5)
+#load the raw file to copy the data
+wb1 = load_workbook(File,read_only=True,data_only=True)
+ws1 = wb1.worksheets[0]
+ws2 = wb1.worksheets[1]
+ws3 = wb1.worksheets[2]
+ws4 = wb1.worksheets[3]
+ws5 = wb1.worksheets[4]
+
+
+#copy first sheet
+wb2 = load_workbook(filename1)
+wss2 = wb2.active
+wss2.title = "sheet1"
+mr = ws1.max_row
+mc = ws1.max_column
+for i in range (1, mr + 1):
+    for j in range (1, mc + 1):
+        
+        c = ws1.cell(row = i, column = j)
+  
+        
+        wss2.cell(row = i, column = j).value = c.value
+        wss2.cell(row = i, column = j).number_format = copy(c.number_format)
+        
+#copy the data in dataframe and save it in excel
+data = ws1.values
+cols = next(data)[1:]
+data = list(data)
+idx = [r[0] for r in data]
+data = (islice(r, 1, None) for r in data)
+df = pd.DataFrame(data, index=idx, columns=cols)
+df.index.names = ['Loan No']
+df = df[[you can rearrange column names here]]
+df.to_excel(filename1, sheet_name='Loan Payable', header=True, index=True,
+             startcol=0, startrow=0)
+
+#load  the excel again to change the formatting
+wb2 = load_workbook(str(filename1))
+wss2 = wb2.active
+
+for cell in wss2["J"]:
+    cell.number_format = "DD/MM/YYYY"
+for cell in wss2["K"]:
+    cell.number_format = "DD/MM/YYYY"
+for cell in wss2["L"]:
+    cell.number_format = "DD/MM/YYYY"
+
+#creating a table out of the copied cells
+tab = Table(displayName="Table1", ref="A1:" + get_column_letter(wss2.max_column) + str(wss2.max_row))
+style = TableStyleInfo(name="TableStyleMedium6", showFirstColumn=False,
+                       showLastColumn=False, showRowStripes=True)
+tab.tableStyleInfo = style
+wss2.add_table(tab)
+
+#changing tab color, save the workbook and close it
+wss2.sheet_properties.tabColor = '00CCFFFF'
+wb2.save(str(filename1))
+wb2.close()
+
+excel = Dispatch('Excel.Application')
+wb = excel.Workbooks.Open(path here)
+
+#Activate 1st sheet
+excel.Worksheets(1).Activate()
+
+wb.Save()
+
+wb.Close()
+#save the file password protected
+password='123'
+book=xw.Book(path here)
+y='Reports'+t.strftime('%d%m%Y')+'.xlsx'
+new_path=Path(__file__).parent.absolute()/"Final"/y
+book.api.SaveAs(str(new_path) ,Password=password)
