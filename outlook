@@ -6,7 +6,7 @@ from PIL import ImageGrab
 xlapp=win32.DispatchEx('Excel.Application')
 xlapp.DisplayAlerts = False
 xlapp.Visible =True
-xlbook=xlapp.Workbooks.Open(r'C:\Users\Parul.Lamba\OneDrive - C2FO\Documents\Reliance\Reliance_suppliers.xlsx')
+xlbook=xlapp.Workbooks.Open(r'C:\Users\Parul.Lamba\Documents\Reliance\abc.xlsx')
 xlbook.RefreshAll()
 xlbook.Save()
 sheet=xlbook.Sheets[0]
