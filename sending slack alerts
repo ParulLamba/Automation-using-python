@@ -1,0 +1,14 @@
+from slack_sdk.webhook import WebhookClient
+
+def send_slack_notification(msg):
+    url = "your webhook url here"
+    webhook = WebhookClient(url)
+    response = webhook.send(text="write text here " + msg)
+    try:
+        assert response.status_code == 200
+        assert response.body == "ok"
+    except:
+        print('Error Sending Slack Notification.')
+
+msg="paste your link here"
+send_slack_notification(msg)
